@@ -1,0 +1,136 @@
+#include <iostream>
+using namespace std;
+/*ASSIGNMENT 1*/
+#define MAX 100
+
+int arr[MAX], n = 0;
+
+void create() {
+    cout << "Enter number of elements: ";
+    cin >> n;
+    cout << "Enter elements: ";
+    for (int i = 0; i < n; i++) cin >> arr[i];
+}
+
+void display() {
+    cout << "Array elements: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << endl;
+}
+
+void insert() {
+    int pos, val;
+    cout << "Enter position : ";
+    cin >> pos;
+    cout << "Enter value: ";
+    cin >> val;
+    for (int i = n; i > pos; i--) arr[i] = arr[i-1];
+    arr[pos] = val;
+    n++;
+}
+
+void deleteElement() {
+    int pos;
+    cout << "Enter position to delete: ";
+    cin >> pos;
+    for (int i = pos; i < n-1; i++) arr[i] = arr[i+1];
+    n--;
+}
+
+void linearSearch() {
+    int key;
+    cout << "Enter element to search: ";
+    cin >> key;
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == key) {
+            cout << "Element found at index " << i << endl;
+            return;
+        }
+    }
+    cout << "Element not found!" << endl;
+}
+
+int main() {
+    /*Question 1*/
+    int choice;
+    do {
+        cout << "\n--- MENU ---\n1.CREATE\n2.DISPLAY\n3.INSERT\n4.DELETE\n5.LINEAR SEARCH\n6.EXIT\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+        switch(choice) {
+            case 1: create(); break;
+            case 2: display(); break;
+            case 3: insert(); break;
+            case 4: deleteElement(); break;
+            case 5: linearSearch(); break;
+            case 6: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice!\n";
+        }
+    } while(choice != 6);
+    /*Question 2*/
+    int arr[10] = {1,2,2,3,4,4,5,6,6,7};
+    int n = 10;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = i+1; j < n; ) {
+            if (arr[i] == arr[j]) {
+                for (int k = j; k < n-1; k++) arr[k] = arr[k+1];
+                n--;
+            } else j++;
+        }
+    }
+    cout << "Unique elements: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    /*Question 3*/
+    cout<<"Output : 10000";
+    /*Question 4a*/
+    int arr[] = {1,2,3,4,5};
+    int n = 5;
+    for (int i = 0; i < n/2; i++) {
+        int temp = arr[i];
+        arr[i] = arr[n-1-i];
+        arr[n-1-i] = temp;
+    }
+    cout << "Reversed array: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    /*Question 4b*/
+    int A[2][2] = {{1,2},{3,4}};
+    int B[2][2] = {{5,6},{7,8}};
+    int C[2][2] = {0};
+
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            for (int k = 0; k < 2; k++)
+                C[i][j] += A[i][k] * B[k][j];
+
+    cout << "Resultant Matrix:\n";
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) cout << C[i][j] << " ";
+        cout << endl;
+    }
+    /*Question 4c*/
+    int A[2][3] = {{1,2,3},{4,5,6}};
+    int T[3][2];
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 3; j++)
+            T[j][i] = A[i][j];
+
+    cout << "Transpose:\n";
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 2; j++) cout << T[i][j] << " ";
+        cout << endl;
+    }
+    /*Question 5*/
+    int A[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
+    int rowSum[3] = {0}, colSum[3] = {0};
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            rowSum[i] += A[i][j];
+            colSum[j] += A[i][j];
+        }
+    }
+
+    for (int i = 0; i < 3; i++) cout << "Sum of row " << i << " = " << rowSum[i] << endl;
+    for (int j = 0; j < 3; j++) cout << "Sum of col " << j << " = " << colSum[j] << endl;
+    return 0;
+}
