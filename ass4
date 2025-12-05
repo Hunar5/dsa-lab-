@@ -1,0 +1,178 @@
+#include <iostream>
+#include <queue>
+#define MAX 100
+using namespace std;
+
+class Queue {
+    int arr[MAX];
+    int front, rear;
+public:
+    Queue() { front = -1; rear = -1; }
+
+    bool isEmpty() { return front == -1; }
+    bool isFull() { return (rear == MAX-1); }
+
+    void enqueue(int x) {
+        if(isFull()) cout << "Queue Overflow\n";
+        else {
+            if(front==-1) front=0;
+            arr[++rear]=x;
+        }
+    }
+
+    void dequeue() {
+        if(isEmpty()) cout << "Queue Underflow\n";
+        else {
+            cout << "Dequeued: " << arr[front] << endl;
+            if(front==rear) front=rear=-1;
+            else front++;
+        }
+    }
+
+    void peek() {
+        if(isEmpty()) cout << "Empty queue\n";
+        else cout << "Front element: " << arr[front] << endl;
+    }
+
+    void display() {
+        if(isEmpty()) cout << "Empty queue\n";
+        else {
+            cout << "Queue: ";
+            for(int i=front;i<=rear;i++) cout << arr[i] << " ";
+            cout << endl;
+        }
+    }
+};
+class CircularQueue {
+    int arr[MAX];
+    int front, rear;
+public:
+    CircularQueue() { front=-1; rear=-1; }
+
+    bool isEmpty() { return front==-1; }
+    bool isFull() { return (front==0 && rear==MAX-1) || (rear==(front-1)%(MAX-1)); }
+
+    void enqueue(int x) {
+        if(isFull()) cout<<"Queue Overflow\n";
+        else {
+            if(front==-1) front=rear=0;
+            else if(rear==MAX-1 && front!=0) rear=0;
+            else rear++;
+            arr[rear]=x;
+        }
+    }
+
+    void dequeue() {
+        if(isEmpty()) cout<<"Queue Underflow\n";
+        else {
+            cout<<"Dequeued: "<<arr[front]<<endl;
+            if(front==rear) front=rear=-1;
+            else if(front==MAX-1) front=0;
+            else front++;
+        }
+    }
+
+    void peek() {
+        if(isEmpty()) cout<<"Empty queue\n";
+        else cout<<"Front element: "<<arr[front]<<endl;
+    }
+
+    void display() {
+        if(isEmpty()) cout<<"Empty queue\n";
+        else {
+            cout<<"Queue: ";
+            if(rear>=front) {
+                for(int i=front;i<=rear;i++) cout<<arr[i]<<" ";
+            } else {
+                for(int i=front;i<MAX;i++) cout<<arr[i]<<" ";
+                for(int i=0;i<=rear;i++) cout<<arr[i]<<" ";
+            }
+            cout<<endl;
+        }
+    }
+};
+void interleave(queue<int>& c) {
+    int n=c.size();
+ queue<int> firstHalf;
+    for(int i=0;i<n/2;i++) {
+        firstHalf.push(c.front()); c.pop();
+    }
+    while(!firstHalf.empty()) {
+        c.push(firstHalf.front()); firstHalf.pop();
+        c.push(c.front()); c.pop();
+    }
+}
+void firstNonRepeating(string str) {
+    queue<char> q;
+    int freq[26]={0};
+    for(char c:str) {
+        freq[c-'a']++;
+        q.push(c);
+        while(!q.empty() && freq[q.front()-'a']>1) q.pop();
+        if(q.empty()) cout<<"-1 ";
+        else cout<<q.front()<<" ";
+    }
+}
+/*Question 5 a) and b)*/
+class StackTwoQ {
+    queue<int> q1,q2;
+public:
+    void push(int x) { q1.push(x); }
+    void pop() {
+        if(q1.empty()) { cout<<"Empty\n"; return; }
+        while(q1.size()>1) { q2.push(q1.front()); q1.pop(); }
+        cout<<"Popped: "<<q1.front()<<endl; q1.pop();
+        swap(q1,q2);
+    }
+};
+class StackOneQ {
+    queue<int> q;
+public:
+    void push(int x) {
+        q.push(x);
+        for(int i=0;i<q.size()-1;i++) {
+            q.push(q.front()); q.pop();
+        }
+    }
+    void pop() {
+        if(q.empty()) { cout<<"Empty\n"; return; }
+        cout<<"Popped: "<<q.front()<<endl; q.pop();
+    }
+};
+int main() {
+    /*Question 1*/
+    Queue q;
+    CircularQueue cq;
+    int choice,val;
+    do {
+        cout<<"\n1.Enqueue 2.Dequeue 3.Peek 4.Display 5.Exit\n";
+        cin>>choice;
+        switch(choice) {
+            case 1: cout<<"Enter value: "; cin>>val; q.enqueue(val); break;
+            case 2: q.dequeue(); break;
+            case 3: q.peek(); break;
+            case 4: q.display(); break;
+        }
+    } while(choice!=5);
+    /*Question 2*/
+    do {
+        cout<<"\n1.Enqueue 2.Dequeue 3.Peek 4.Display 5.Exit\n";
+        cin>>choice;
+        switch(choice) {
+            case 1: cout<<"Enter value: "; cin>>val; cq.enqueue(val); break;
+            case 2: cq.dequeue(); break;
+            case 3: cq.peek(); break;
+            case 4: cq.display(); break;
+        }
+    } while(choice!=5);
+    /*Question 3*/
+    queue<int> c;
+    int arr[]={4,7,11,20,5,9};
+    for(int x:arr) c.push(x);
+    interleave(c);
+    while(!c.empty()) { cout<<c.front()<<" "; c.pop(); }
+    /*Question 4*/
+    string s="aabc";
+    firstNonRepeating(s);
+
+}
