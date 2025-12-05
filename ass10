@@ -1,0 +1,120 @@
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
+using namespace std;
+
+// 1. Check duplicates using hash set
+bool containsDuplicate(const vector<int>& nums) {
+    unordered_set<int> s;
+    for (int x : nums) {
+        if (s.count(x)) return true;
+        s.insert(x);
+    }
+    return false;
+}
+
+// 2. Find common elements using hash set
+vector<int> commonElements(const vector<int>& A, const vector<int>& B) {
+    unordered_set<int> s(A.begin(), A.end());
+    vector<int> result;
+    for (int x : B) {
+        if (s.count(x)) result.push_back(x);
+    }
+    return result;
+}
+
+// 3. Frequency count using hash map
+void frequencyCount(const vector<int>& nums) {
+    unordered_map<int,int> freq;
+    for (int x : nums) freq[x]++;
+    for (auto& p : freq) {
+        cout << p.first << " -> " << p.second << " times\n";
+    }
+}
+
+// 4. First non-repeating element
+int firstNonRepeating(const vector<int>& nums) {
+    unordered_map<int,int> freq;
+    for (int x : nums) freq[x]++;
+    for (int x : nums) {
+        if (freq[x] == 1) return x;
+    }
+    return -1; // if none
+}
+
+// 5. Detect loop in linked list using hash set
+struct Node {
+    int data;
+    Node* next;
+    Node(int d) : data(d), next(nullptr) {}
+};
+
+bool hasCycle(Node* head) {
+    unordered_set<Node*> visited;
+    while (head) {
+        if (visited.count(head)) return true;
+        visited.insert(head);
+        head = head->next;
+    }
+    return false;
+}
+
+// 6. Check duplicates in binary tree using hash set
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int v) : val(v), left(nullptr), right(nullptr) {}
+};
+
+bool checkDuplicates(TreeNode* root, unordered_set<int>& seen) {
+    if (!root) return false;
+    if (seen.count(root->val)) return true;
+    seen.insert(root->val);
+    return checkDuplicates(root->left, seen) || checkDuplicates(root->right, seen);
+}
+
+bool treeHasDuplicates(TreeNode* root) {
+    unordered_set<int> seen;
+    return checkDuplicates(root, seen);
+}
+
+int main() {
+    // 1. Duplicates
+    vector<int> nums1 = {1,2,3,1};
+    cout << "Contains duplicate? " << (containsDuplicate(nums1) ? "true" : "false") << endl;
+
+    // 2. Common elements
+    vector<int> A = {1,2,3,4}, B = {3,4,5,6};
+    auto common = commonElements(A,B);
+    cout << "Common elements: ";
+    for (int x : common) cout << x << " ";
+    cout << endl;
+
+    // 3. Frequency count
+    vector<int> nums2 = {2,3,2,4,3,2};
+    cout << "Frequency count:\n";
+    frequencyCount(nums2);
+
+    // 4. First non-repeating
+    vector<int> nums3 = {4,5,1,2,0,4};
+    cout << "First non-repeating element: " << firstNonRepeating(nums3) << endl;
+
+    // 5. Linked list cycle
+    Node* head = new Node(1);
+    head->next = new Node(2);
+    head->next->next = new Node(3);
+    head->next->next->next = new Node(4);
+    head->next->next->next->next = head->next; // cycle back to node 2
+    cout << "Linked list has cycle? " << (hasCycle(head) ? "true" : "false") << endl;
+
+    // 6. Binary tree duplicates
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->left = new TreeNode(2); // duplicate
+    cout << "Tree has duplicates? " << (treeHasDuplicates(root) ? "true" : "false") << endl;
+
+    return 0;
+}
