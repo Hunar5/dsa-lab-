@@ -1,0 +1,212 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+};
+
+class DLL {
+    Node* head;
+public:
+    DLL() { head=NULL; }
+
+    void insertBegin(int x) {
+        Node* temp=new Node{x,NULL,head};
+        if(head) head->prev=temp;
+        head=temp;
+    }
+
+    void insertEnd(int x) {
+        Node* temp=new Node{x,NULL,NULL};
+        if(!head) { head=temp; return; }
+        Node* curr=head;
+        while(curr->next) curr=curr->next;
+        curr->next=temp; temp->prev=curr;
+    }
+
+    void insertAfter(int key,int x) {
+        Node* curr=head;
+        while(curr && curr->data!=key) curr=curr->next;
+        if(curr) {
+            Node* temp=new Node{x,curr,curr->next};
+            if(curr->next) curr->next->prev=temp;
+            curr->next=temp;
+        }
+    }
+
+    void insertBefore(int key,int x) {
+        Node* curr=head;
+        while(curr && curr->data!=key) curr=curr->next;
+        if(curr) {
+            Node* temp=new Node{x,curr->prev,curr};
+            if(curr->prev) curr->prev->next=temp;
+            else head=temp;
+            curr->prev=temp;
+        }
+    }
+
+    void deleteKey(int key) {
+        Node* curr=head;
+        while(curr && curr->data!=key) curr=curr->next;
+        if(!curr) return;
+        if(curr->prev) curr->prev->next=curr->next;
+        else head=curr->next;
+        if(curr->next) curr->next->prev=curr->prev;
+        delete curr;
+    }
+
+    void search(int key) {
+        Node* curr=head; int pos=1;
+        while(curr) {
+            if(curr->data==key) { cout<<"Found at position "<<pos<<endl; return; }
+            curr=curr->next; pos++;
+        }
+        cout<<"Not found\n";
+    }
+
+    void display() {
+        Node* curr=head;
+        while(curr) { cout<<curr->data<<" "; curr=curr->next; }
+        cout<<endl;
+    }
+};
+struct CNode {
+    int data;
+    CNode* next;
+};
+
+class CLL {
+    CNode* head;
+public:
+    CLL() { head=NULL; }
+
+    void insertEnd(int x) {
+        CNode* temp=new CNode{x,NULL};
+        if(!head) { head=temp; temp->next=head; head=temp; return; }
+        CNode* curr=head;
+        while(curr->next!=head) curr=curr->next;
+        curr->next=temp; temp->next=head;
+    }
+
+    void deleteKey(int key) {
+        if(!head) return;
+        CNode* curr=head, *prev=NULL;
+        do {
+            if(curr->data==key) {
+                if(prev) prev->next=curr->next;
+                else {
+                    // deleting head
+                    CNode* last=head;
+                    while(last->next!=head) last=last->next;
+                    head=head->next;
+                    last->next=head;
+                }
+                delete curr; return;
+            }
+            prev=curr; curr=curr->next;
+        } while(curr!=head);
+    }
+
+    void search(int key) {
+        if(!head) return;
+        CNode* curr=head; int pos=1;
+        do {
+            if(curr->data==key) { cout<<"Found at position "<<pos<<endl; return; }
+            curr=curr->next; pos++;
+        } while(curr!=head);
+        cout<<"Not found\n";
+    }
+
+    void display() {
+        if(!head) return;
+        CNode* curr=head;
+        do { cout<<curr->data<<" "; curr=curr->next; } while(curr!=head);
+        cout<<endl;
+    }
+};
+void displayCircular(CNode* head) {
+    if(!head) return;
+    CNode* curr=head;
+    do { cout<<curr->data<<" "; curr=curr->next; } while(curr!=head);
+    cout<<head->data<<endl; // repeat head
+}
+int sizeDLL(Node* head) {
+    int count=0; while(head) { count++; head=head->next; }
+    return count;
+}
+
+int sizeCLL(CNode* head) {
+    if(!head) return 0;
+    int count=0; CNode* curr=head;
+    do { count++; curr=curr->next; } while(curr!=head);
+    return count;
+}
+bool isPalindrome(Node* head) {
+    if(!head) return true;
+    Node* tail=head;
+    while(tail->next) tail=tail->next;
+    while(head!=tail && tail->next!=head) {
+        if(head->data!=tail->data) return false;
+        head=head->next; tail=tail->prev;
+    }
+    return true;
+}
+bool isCircular(CNode* head) {
+    if(!head) return false;
+    CNode* curr=head->next;
+    while(curr && curr!=head) curr=curr->next;
+    return (curr==head);
+}
+
+int main() {
+    DLL dll;
+    CLL cll;
+    int choice, val, key;
+
+    do {
+        cout << "\n--- Lab 6 Menu ---\n";
+        cout << "1. DLL Insert Begin\n";
+        cout << "2. DLL Insert End\n";
+        cout << "3. DLL Insert After\n";
+        cout << "4. DLL Insert Before\n";
+        cout << "5. DLL Delete Key\n";
+        cout << "6. DLL Search\n";
+        cout << "7. DLL Display\n";
+        cout << "8. DLL Size\n";
+        cout << "9. DLL Palindrome Check\n";
+        cout << "10. CLL Insert End\n";
+        cout << "11. CLL Delete Key\n";
+        cout << "12. CLL Search\n";
+        cout << "13. CLL Display\n";
+        cout << "14. CLL Display with Head Repeated\n";
+        cout << "15. CLL Size\n";
+        cout << "16. Check if CLL is Circular\n";
+        cout << "0. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch(choice) {
+            case 1: cout<<"Enter value: "; cin>>val; dll.insertBegin(val); break;
+            case 2: cout<<"Enter value: "; cin>>val; dll.insertEnd(val); break;
+            case 3: cout<<"Enter key and value: "; cin>>key>>val; dll.insertAfter(key,val); break;
+            case 4: cout<<"Enter key and value: "; cin>>key>>val; dll.insertBefore(key,val); break;
+            case 5: cout<<"Enter key: "; cin>>key; dll.deleteKey(key); break;
+            case 6: cout<<"Enter key: "; cin>>key; dll.search(key); break;
+            case 7: dll.display(); break;
+            case 8: cout<<"DLL Size: "<<sizeDLL(nullptr)<<" (replace nullptr with dll head)\n"; break;
+            case 9: cout<<(isPalindrome(nullptr) ? "Palindrome\n" : "Not Palindrome\n"); break;
+
+            case 10: cout<<"Enter value: "; cin>>val; cll.insertEnd(val); break;
+            case 11: cout<<"Enter key: "; cin>>key; cll.deleteKey(key); break;
+            case 12: cout<<"Enter key: "; cin>>key; cll.search(key); break;
+            case 13: cll.display(); break;
+            case 14: displayCircular(nullptr); break; // replace nullptr with cll head
+            case 15: cout<<"CLL Size: "<<sizeCLL(nullptr)<<"\n"; break;
+            case 16: cout<<(isCircular(nullptr) ? "Circular\n" : "Not Circular\n"); break;
+        }
+    } while(choice!=0);
+
+    return 0;
+}
