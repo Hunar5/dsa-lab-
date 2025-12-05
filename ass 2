@@ -1,0 +1,141 @@
+#include <iostream>
+using namespace std;
+
+int binarySearch(int arr[], int n, int key) {
+    int low = 0, high = n - 1;
+    while (low <= high) {
+        int mid = low + (high - low)/2;
+        if (arr[mid] == key) return mid;
+        else if (arr[mid] < key) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1;
+}
+void bubbleSort(int arr[], int n) {
+    for (int pass = 0; pass < n - 1; pass++) {
+        bool swapped = false;
+        for (int j = 0; j < n - 1 - pass; j++) {
+            if (arr[j] > arr[j+1]) {
+                int t = arr[j]; arr[j] = arr[j+1]; arr[j+1] = t;
+                swapped = true;
+            }
+        }
+        if (!swapped) break;
+    }
+}
+int missingLinear(int arr[], int n) {
+    // Expected sum of 1..n
+    int expected = n * (n + 1) / 2;
+    int actual = 0;
+    for (int i = 0; i < n - 1; i++) {
+        actual += arr[i];
+    }
+    return expected - actual;
+}
+int missingBinary(int arr[], int n) {
+    int low = 0, high = n - 2; // array length n-1
+    while (low <= high) {
+        int mid = low + (high - low)/2;
+        if (arr[mid] == mid + 1) low = mid + 1;
+        else high = mid - 1;
+    }
+    return low + 1;
+}
+void concat(char a[], char b[]) {
+    int i = 0; while (a[i] != '\0') i++;
+    int j = 0; while (b[j] != '\0') { a[i++] = b[j++]; }
+    a[i] = '\0';
+}
+void reverseStr(char s[]) {
+    int i = 0; while (s[i] != '\0') i++;
+    int l = 0, r = i - 1;
+    while (l < r) { char t = s[l]; s[l] = s[r]; s[r] = t; l++; r--; }
+}
+bool isVowel(char c) {
+    char x = (c >= 'A' && c <= 'Z') ? (c - 'A' + 'a') : c;
+    return x=='a'||x=='e'||x=='i'||x=='o'||x=='u';
+}
+void deleteVowels(char s[]) {
+    int i = 0, j = 0;
+    while (s[i] != '\0') {
+        if (!isVowel(s[i])) s[j++] = s[i];
+        i++;
+    }
+    s[j] = '\0';
+}
+int cmp(const char *a, const char *b) {
+    int i = 0;
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] < b[i]) return -1;
+        if (a[i] > b[i]) return 1;
+        i++;
+    }
+    if (a[i] == '\0' && b[i] == '\0') return 0;
+    return (a[i] == '\0') ? -1 : 1;
+}
+void sortStrings(char arr[][50], int n) {
+    for (int p = 0; p < n - 1; p++) {
+        for (int j = 0; j < n - 1 - p; j++) {
+            if (cmp(arr[j], arr[j+1]) > 0) {
+                char t[50];
+                int k = 0; while ((t[k] = arr[j][k]) != '\0') k++;
+                k = 0; while ((arr[j][k] = arr[j+1][k]) != '\0') k++;
+                k = 0; while ((arr[j+1][k] = t[k]) != '\0') k++;
+            }
+        }
+    }
+}
+char toLowerChar(char c) {
+    if (c >= 'A' && c <= 'Z') return c - 'A' + 'a';
+    return c;
+}
+
+int main() {
+    /*Question 1*/
+    int arr[] = {11, 22, 34, 64, 90};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    int key = 34;
+    int idx = binarySearch(arr, n, key);
+    if (idx != -1) cout << "Found at index " << idx << endl;
+    else cout << "Not found" << endl;
+    /*Question 2*/
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    bubbleSort(arr, n);
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << endl;
+    /*Question 3 using linear search*/
+    int arr[] = {1,2,3,4,6,7,8}; // n = 8, missing 5
+    int n = 8;
+    cout << "Missing number: " << missingLinear(arr, n) << endl;
+    /*Question 3 using binary search*/
+    int arr[] = {1,2,3,4,6,7,8}; // n = 8, missing 5
+    int n = 8;
+    cout << "Missing: " << missingBinary(arr, n) << endl;
+    /*Question 4*/
+    char a[100] = "Hello", b[50] = "World";
+    concat(a, b);
+    cout << "Concat: " << a << endl;
+
+    char s1[100] = "Data";
+    reverseStr(s1);
+    cout << "Reverse: " << s1 << endl;
+
+    char s2[100] = "Beautiful";
+    deleteVowels(s2);
+    cout << "No vowels: " << s2 << endl;
+
+    char list[5][50] = {"banana","apple","grape","apricot","cherry"};
+    sortStrings(list, 5);
+    cout << "Sorted:\n";
+    for (int i = 0; i < 5; i++) cout << list[i] << endl;
+
+    char c = 'Q';
+    cout << "Lower of Q: " << toLowerChar(c) << endl;
+    /*Question 5*/
+    
+
+
+
+
+}
