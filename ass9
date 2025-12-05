@@ -1,0 +1,296 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <list>
+#include <stack>
+#include <algorithm>
+#include <iomanip>
+#include <climits>
+#include <map>
+
+using namespace std;
+
+// === Graph Base Class for BFS/DFS ===
+class GraphBFSDFS {
+public:
+    int V;
+    list<int>* adj;
+
+    GraphBFSDFS(int V_val) : V(V_val) {
+        adj = new list<int>[V];
+    }
+
+    ~GraphBFSDFS() {
+        delete[] adj;
+    }
+
+    void addEdge(int v, int w) {
+        adj[v].push_back(w);
+        // For an undirected graph
+        adj[w].push_back(v);
+    }
+
+    // --- BFS Implementation ---
+    void BFS(int s) {
+        vector<bool> visited(V, false);
+        queue<int> q;
+
+        visited[s] = true;
+        q.push(s);
+
+        cout << "BFS traversal starting from vertex " << s << ": ";
+        while (!q.empty()) {
+            int curr = q.front();
+            q.pop();
+            cout << curr << " ";
+
+            for (int neighbor : adj[curr]) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    q.push(neighbor);
+                }
+            }
+        }
+        cout << endl;
+    }
+
+    // --- DFS Implementation ---
+    void DFSUtil(int v, vector<bool>& visited) {
+        visited[v] = true;
+        cout << v << " ";
+
+        for (int neighbor : adj[v]) {
+            if (!visited[neighbor]) {
+                DFSUtil(neighbor, visited);
+            }
+        }
+    }
+
+    void DFS(int s) {
+        vector<bool> visited(V, false);
+        cout << "DFS traversal starting from vertex " << s << ": ";
+        DFSUtil(s, visited);
+        cout << endl;
+    }
+};
+
+// === Kruskal's Algorithm Structures and Class ===
+
+struct Edge {
+    int src, dest, weight;
+};
+
+struct Subset {
+    int parent, rank;
+};
+
+bool compareEdges(const Edge& a, const Edge& b) {
+    return a.weight < b.weight;
+}
+
+int findParent(Subset subsets[], int i) {
+    if (subsets[i].parent != i)
+        subsets[i].parent = findParent(subsets, subsets[i].parent);
+    return subsets[i].parent;
+}
+
+void uniteSets(Subset subsets[], int x, int y) {
+    int rootX = findParent(subsets, x);
+    int rootY = findParent(subsets, y);
+    if (subsets[rootX].rank < subsets[rootY].rank)
+        subsets[rootX].parent = rootY;
+    else if (subsets[rootX].rank > subsets[rootY].rank)
+        subsets[rootY].parent = rootX;
+    else {
+        subsets[rootY].parent = rootX;
+        subsets[rootX].rank++;
+    }
+}
+
+class GraphKruskal {
+public:
+    int V, E;
+    vector<Edge> edges;
+
+    GraphKruskal(int V_val, int E_val) : V(V_val), E(E_val) {}
+
+    void addEdge(int src, int dest, int weight) {
+        edges.push_back({src, dest, weight});
+    }
+
+    void kruskalMST() {
+        vector<Edge> result;
+        sort(edges.begin(), edges.end(), compareEdges);
+
+        Subset* subsets = new Subset[V];
+        for (int v = 0; v < V; ++v) {
+            subsets[v].parent = v;
+            subsets[v].rank = 0;
+        }
+
+        int edgesCount = 0;
+        int i = 0;
+        while (edgesCount < V - 1 && i < E) {
+            Edge nextEdge = edges[i++];
+            int x = findParent(subsets, nextEdge.src);
+            int y = findParent(subsets, nextEdge.dest);
+
+            if (x != y) {
+                result.push_back(nextEdge);
+                uniteSets(subsets, x, y);
+                edgesCount++;
+            }
+        }
+
+        cout << "Edges in the MST (Kruskal):" << endl;
+        for (Edge edge : result) {
+            cout << edge.src << " -- " << edge.dest << " == " << edge.weight << endl;
+        }
+        delete[] subsets;
+    }
+};
+
+// === Prim's and Dijkstra's Algorithms Class ===
+
+class GraphPrimDijkstra {
+public:
+    int V;
+    // Adjacency list stores pairs of (destination_vertex, weight)
+    vector<vector<pair<int, int>>> adj;
+
+    GraphPrimDijkstra(int V_val) : V(V_val) {
+        adj.resize(V);
+    }
+
+    void addEdge(int u, int v, int weight, bool directed = false) {
+        adj[u].push_back({v, weight});
+        if (!directed) {
+            adj[v].push_back({u, weight});
+        }
+    }
+
+    // --- Prim's Algorithm ---
+    void primMST() {
+        // Priority queue stores pairs of (weight, vertex)
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        vector<int> key(V, INT_MAX);
+        vector<int> parent(V, -1);
+        vector<bool> inMST(V, false);
+
+        // Start with vertex 0
+        key[0] = 0;
+        pq.push({0, 0});
+
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            pq.pop();
+
+            // If the vertex is already included, skip it
+            if (inMST[u]) continue;
+
+            inMST[u] = true;
+
+            for (auto& edge : adj[u]) {
+                int v = edge.first;
+                int weight = edge.second;
+
+                if (!inMST[v] && weight < key[v]) {
+                    key[v] = weight;
+                    parent[v] = u;
+                    pq.push({key[v], v});
+                }
+            }
+        }
+
+        cout << "Edges in the MST (Prim):" << endl;
+        for (int i = 1; i < V; ++i) {
+            cout << parent[i] << " -- " << i << " == " << key[i] << endl;
+        }
+    }
+
+    // --- Dijkstra's Algorithm ---
+    void dijkstra(int src) {
+        // Priority queue stores pairs of (distance, vertex)
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        vector<int> dist(V, INT_MAX);
+
+        dist[src] = 0;
+        pq.push({0, src});
+
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            pq.pop();
+
+            // Check if the current distance to u is valid/updated
+            if (dist[u] == INT_MAX) continue;
+
+            for (auto& edge : adj[u]) {
+                int v = edge.first;
+                int weight = edge.second;
+
+                if (dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    pq.push({dist[v], v});
+                }
+            }
+        }
+
+        cout << "Shortest distances from source " << src << " (Dijkstra):" << endl;
+        for (int i = 0; i < V; ++i) {
+            cout << "Vertex " << i << ": " << dist[i] << endl;
+        }
+    }
+};
+
+
+// === Main Function to Demonstrate Usage ===
+
+int main() {
+    // 1. BFS & DFS Example (using undirected graphs)
+    cout << "--- BFS & DFS Examples ---" << endl;
+    GraphBFSDFS g_bfs_dfs(4);
+    g_bfs_dfs.addEdge(0, 1);
+    g_bfs_dfs.addEdge(0, 2);
+    g_bfs_dfs.addEdge(1, 2);
+    g_bfs_dfs.addEdge(2, 3);
+    g_bfs_dfs.BFS(2);
+    g_bfs_dfs.DFS(2);
+
+    // 2. Kruskal's MST Example (using an undirected weighted graph)
+    cout << "\n--- Kruskal's MST Example ---" << endl;
+    // V=4 vertices, E=5 edges
+    GraphKruskal g_kruskal(4, 5); 
+    g_kruskal.addEdge(0, 1, 10);
+    g_kruskal.addEdge(0, 2, 6);
+    g_kruskal.addEdge(0, 3, 5);
+    g_kruskal.addEdge(1, 3, 15);
+    g_kruskal.addEdge(2, 3, 4);
+    g_kruskal.kruskalMST();
+
+    // 3. Prim's MST Example (using an undirected weighted graph)
+    cout << "\n--- Prim's MST Example ---" << endl;
+    GraphPrimDijkstra g_prim(5);
+    g_prim.addEdge(0, 1, 2);
+    g_prim.addEdge(0, 3, 6);
+    g_prim.addEdge(1, 2, 3);
+    g_prim.addEdge(1, 3, 8);
+    g_prim.addEdge(1, 4, 5);
+    g_prim.addEdge(2, 4, 7);
+    g_prim.addEdge(3, 4, 9);
+    g_prim.primMST();
+
+    // 4. Dijkstra's Shortest Path Example (using a directed weighted graph)
+    cout << "\n--- Dijkstra's Example ---" << endl;
+    GraphPrimDijkstra g_dijkstra(6);
+    // Directed edges for Dijkstra
+    g_dijkstra.addEdge(0, 1, 4, true);
+    g_dijkstra.addEdge(0, 2, 2, true);
+    g_dijkstra.addEdge(1, 2, 5, true);
+    g_dijkstra.addEdge(1, 3, 10, true);
+    g_dijkstra.addEdge(2, 4, 3, true);
+    g_dijkstra.addEdge(4, 3, 4, true);
+    g_dijkstra.addEdge(3, 5, 11, true);
+    g_dijkstra.dijkstra(0);
+
+    return 0;
+}
